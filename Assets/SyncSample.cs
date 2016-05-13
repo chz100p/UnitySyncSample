@@ -1,30 +1,60 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
-public class SyncSample : MonoBehaviour {
+public class SyncSample : MonoBehaviour
+{
 
-	// Use this for initialization
-	public GameObject prefab;
-	int targetFps = 10;
+    // Use this for initialization
+    public GameObject prefab;
+    public Text fps;
+    public Text unscaledFps;
+    public Text scale;
 
-	[Range(0.1f, 100f)]
-	public float timeScale = 1;
+    [Range(1, 240)]
+    public int targetFps = 50;
 
-	void Start () {
-	}
+    [Range(0f, 100f)]
+    public float timeScale = 1;
+    float nextTime;
+    int cnt;
+    int prevCnt;
+    float unscaledNextTime;
+    int unscaledCnt;
+    void Start()
+    {
+        QualitySettings.vSyncCount = 0;
+        Time.timeScale = timeScale;
+        Time.captureFramerate = (int)(targetFps * timeScale);
+        Application.targetFrameRate = (int)(targetFps * timeScale);
+        nextTime = Time.time + 1;
+        cnt = 0;
+        unscaledNextTime = Time.unscaledTime + 1;
+        unscaledCnt = 0;
+    }
 
-	int cnt = 0;
-	void Update () {
-		QualitySettings.vSyncCount = 0;
-		float deltaTime = 1.0f / (float)targetFps;
-		Time.timeScale = timeScale;
-		Time.captureFramerate = (int)(1.0f / deltaTime * timeScale);
-		//Application.targetFrameRate = 300;
+    void Update()
+    {
+        Time.timeScale = timeScale;
+        Time.captureFramerate = (int)(targetFps * timeScale);
+        Application.targetFrameRate = (int)(targetFps * timeScale);
 
-		cnt++;
-		if (cnt % targetFps == 0) {
-			Object.Instantiate(prefab, new Vector3(0,5,0), Quaternion.identity);
-			Debug.Log ((cnt/targetFps).ToString() + "sec passed.");
-		}
-	}
+        cnt++;
+        if (Time.time >= nextTime)
+        {
+            Object.Instantiate(prefab, new Vector3(0, 5, 0), Quaternion.identity);
+            fps.text = "" + cnt;
+            prevCnt = cnt;
+            cnt = 0;
+            nextTime += 1;
+        }
+        unscaledCnt++;
+        if (Time.unscaledTime >= unscaledNextTime)
+        {
+            unscaledFps.text = "" + unscaledCnt;
+            scale.text = "x" + (float)unscaledCnt / prevCnt;
+            unscaledCnt = 0;
+            unscaledNextTime += 1;
+        }
+    }
 }
