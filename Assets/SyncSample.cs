@@ -10,6 +10,7 @@ public class SyncSample : MonoBehaviour
     public Text fps;
     public Text unscaledFps;
     public Text scale;
+    public Text unscaledFixed;
 
     [Range(1, 240)]
     public int targetFps = 50;
@@ -21,6 +22,7 @@ public class SyncSample : MonoBehaviour
     int prevCnt;
     float unscaledNextTime;
     int unscaledCnt;
+    int unscaledFixedCnt;
     void Start()
     {
         QualitySettings.vSyncCount = 0;
@@ -31,8 +33,13 @@ public class SyncSample : MonoBehaviour
         cnt = 0;
         unscaledNextTime = Time.unscaledTime + 1;
         unscaledCnt = 0;
+        unscaledFixedCnt = 0;
     }
 
+    void FixedUpdate()
+    {
+        unscaledFixedCnt++;
+    }
     void Update()
     {
         Time.timeScale = timeScale;
@@ -55,6 +62,8 @@ public class SyncSample : MonoBehaviour
             scale.text = "x" + (float)unscaledCnt / prevCnt;
             unscaledCnt = 0;
             unscaledNextTime += 1;
+            unscaledFixed.text = "" + unscaledFixedCnt;
+            unscaledFixedCnt = 0;
         }
     }
 }
